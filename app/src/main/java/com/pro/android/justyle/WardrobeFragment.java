@@ -47,17 +47,20 @@ import static android.app.Activity.RESULT_OK;
 
 
 public class WardrobeFragment extends Fragment implements View.OnClickListener {
-    private static final String TAG = "WardrobeFragment";
+
+        private static final String TAG = "WardrobeFragment";
     private static final int PICK_IMAGE_REQUEST = 234;
+    private static final int TAKE_PIC_REQUEST = 1;
+
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseStorage storage = FirebaseStorage.getInstance();
     private TextView mTextViewNickname;
     private FirebaseFirestore mFirebaseFirestore;
     private DocumentReference mDocumentReference;
-    private Button uploadButton, chooseButton;
-    public static ImageView mImageView;
-    public static Uri mImageUri;
+    private Button uploadButton, chooseButton, takePicButton;
+    static ImageView mImageView;
+     static Uri mImageUri;
 
 
 
@@ -70,20 +73,30 @@ public class WardrobeFragment extends Fragment implements View.OnClickListener {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         View v = inflater.inflate(R.layout.fragment_wardrobe, container, false);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         FirebaseUser user = mFirebaseAuth.getCurrentUser();
         mFirebaseFirestore = FirebaseFirestore.getInstance();
-        mTextViewNickname = (TextView) v.findViewById(R.id.Nickname);
-        uploadButton = (Button) v.findViewById(R.id.uploadButtonId);
-        chooseButton = (Button) v.findViewById(R.id.ChooseButtonId);
-        mImageView = (ImageView) v.findViewById(R.id.imageViewId);
+        mTextViewNickname =  v.findViewById(R.id.Nickname);
+        uploadButton =  v.findViewById(R.id.uploadButtonId);
+        chooseButton =  v.findViewById(R.id.ChooseButtonId);
+        takePicButton =  v.findViewById(R.id.takePicId) ;
+
+        mImageView = v.findViewById(R.id.imageViewId);
 
         chooseButton.setOnClickListener(this);
 
+        takePicButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), CameraActivity.class);
+                startActivityForResult(intent, TAKE_PIC_REQUEST);
 
+
+            }
+        });
 
         uploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,7 +131,6 @@ public class WardrobeFragment extends Fragment implements View.OnClickListener {
         return v;
 
     }
-
     private void showFileChoose(){
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -133,12 +145,23 @@ public class WardrobeFragment extends Fragment implements View.OnClickListener {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() !=null){
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             mImageUri = data.getData();
 
             //imageView.setImageURI(mImageUri);
-            Picasso.with(getContext())
+            Picasso.get()
                     .load(mImageUri)
+                    .resize(600,600)
+                    .centerCrop()
+                    .into(mImageView);
+
+        }
+        //if (requestCode == TAKE_PIC_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+
+      //  }
+        else {
+            Picasso.get()
+                    .load(CameraActivity.pathToFile)
                     .into(mImageView);
 
         }

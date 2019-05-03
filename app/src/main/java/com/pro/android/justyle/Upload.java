@@ -1,9 +1,13 @@
 package com.pro.android.justyle;
 
+import com.google.firebase.database.Exclude;
+
 public class Upload{
 private String mName;
 private String mImageUrl;
 private String mDescription;
+private String mKey;
+
 
 
         /**
@@ -14,7 +18,7 @@ public Upload(){
         }
 
 
-public Upload (String name, String imageUrl, String description) {
+Upload(String name, String imageUrl, String description) {
 
         if (name.trim().equals("")){
         name = "No name";
@@ -38,7 +42,7 @@ public void setName (String name){
         mName = name;
         }
 
-public String getImageUrl(){
+String getImageUrl(){
         return mImageUrl;
         }
 
@@ -46,11 +50,18 @@ public void setImageUrl (String imageUrl){
         mImageUrl = imageUrl;
         }
 
-        public String getDescription(){
+        String getDescription(){
                 return mDescription;
         }
 
         public void setDescription (String description){
                 mDescription = description;
         }
-        }
+@Exclude // we don't want this in firebase database because we already have a key
+String getKey(){
+        return mKey;
+}
+        @Exclude
+        void setKey(String key){ mKey = key; }
+
+}

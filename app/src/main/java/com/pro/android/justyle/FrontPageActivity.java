@@ -17,6 +17,8 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserInfo;
 
 public class FrontPageActivity extends AppCompatActivity implements FragmentActionListener {
 
@@ -25,6 +27,7 @@ public class FrontPageActivity extends AppCompatActivity implements FragmentActi
     FragmentTransaction mFragmentTransaction;
     private Button mProfileButton, mActivityButton, mMoreButton;
     private ImageButton mCameraButton;
+    public static String userUid;
 
     static boolean isWifiConn = false;
     static int level;
@@ -37,10 +40,16 @@ public class FrontPageActivity extends AppCompatActivity implements FragmentActi
         setContentView(R.layout.activity_front_page);
         mFragmentManager = getSupportFragmentManager();
         mFirebaseAuth = FirebaseAuth.getInstance();
-        mActivityButton = (Button) findViewById(R.id.ActivityButton);
-        mProfileButton = (Button) findViewById(R.id.ProfileButton);
-        mMoreButton = (Button) findViewById(R.id.MoreButton);
-        mCameraButton = (ImageButton) findViewById(R.id.CameraButton);
+        mActivityButton =  findViewById(R.id.ActivityButton);
+        mProfileButton =  findViewById(R.id.ProfileButton);
+        mMoreButton =  findViewById(R.id.MoreButton);
+        mCameraButton =  findViewById(R.id.CameraButton);
+
+
+
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        userUid = currentUser.getUid();
+
 
         //wifi
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -50,7 +59,7 @@ public class FrontPageActivity extends AppCompatActivity implements FragmentActi
             if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI){
                 isWifiConn |= networkInfo.isConnected();
             } else{
-                isWifiConn |= networkInfo.isConnected();
+                isWifiConn = false;
             }
         }
         //battery
@@ -67,22 +76,27 @@ public class FrontPageActivity extends AppCompatActivity implements FragmentActi
                 startActivity(new Intent(FrontPageActivity.this,ProfileActivity.class));
             }
         });
+
+        //front page button
         mActivityButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(FrontPageActivity.this, "Not set yet", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(FrontPageActivity.this,FrontPageActivity.class));
+
             }
         });
         mMoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(FrontPageActivity.this, "Not set yet", Toast.LENGTH_SHORT).show();
+             //   startActivity(new Intent(FrontPageActivity.this,MarketplaceActivity.class));
             }
         });
         mCameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(FrontPageActivity.this, CameraActivity.class));
+             //   startActivity(new Intent(FrontPageActivity.this, CameraActivity.class));
+
+                addWardrobeFragment();
             }
         });
 
@@ -136,12 +150,16 @@ public class FrontPageActivity extends AppCompatActivity implements FragmentActi
     @Override
     public void onWardrobeFragmentClicked() {
 
-        addWardrobeFragment();
+       // addWardrobeFragment();
+        startActivity(new Intent(FrontPageActivity.this,MyWardrobeActivity.class));
+
 
     }
     @Override
     public void onMarketplaceFragmentClicked(){
-        addMarketplaceFragment();
+       // addMarketplaceFragment();
+
+        startActivity(new Intent(FrontPageActivity.this,MarketplaceActivity.class));
 
 
     }

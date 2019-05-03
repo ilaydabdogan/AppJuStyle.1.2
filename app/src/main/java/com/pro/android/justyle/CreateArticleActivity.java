@@ -10,16 +10,21 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -27,9 +32,10 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
-import static com.pro.android.justyle.CameraActivity.newImageUri;
 import static com.pro.android.justyle.FrontPageActivity.isWifiConn;
+import static com.pro.android.justyle.FrontPageActivity.userUid;
 import static com.pro.android.justyle.WardrobeFragment.mImageUri;
 
 
@@ -41,11 +47,12 @@ public class CreateArticleActivity extends AppCompatActivity {
     private EditText mArticleName;
     private ImageView mArticleImg;
     private ProgressBar mProgressBar;
+    private TextView mUserName;
 
-    private StorageReference mStorageRef;
-    private DatabaseReference mDatabaseRef;
+    protected StorageReference mStorageRef;
+    protected DatabaseReference mDatabaseRef;
 
-    private StorageTask mUploadTask;
+    protected StorageTask mUploadTask;
 
 
     @Override
@@ -57,23 +64,38 @@ public class CreateArticleActivity extends AppCompatActivity {
         mArticleText = findViewById(R.id.ArticleTextId);
         mArticleName = findViewById(R.id.ArticleNameId);
         mArticleImg = findViewById(R.id.articleImageId);
+        mUserName = findViewById(R.id.createUserName);
 
-        mArticleImg.setImageURI(mImageUri);
+
+       // mArticleImg.setImageURI(mImageUri);
+        Picasso.get()
+                .load(mImageUri)
+                .resize(600,600)
+                .centerCrop()
+                .into(mArticleImg);
+
+
+        // get the user name
+      //  mUserName
+
+
+
 
 
         mCreateButton = findViewById(R.id.buttonCreateArticleId);
         mProgressBar = findViewById(R.id.progressBarId);
 
-
-        mStorageRef = FirebaseStorage.getInstance().getReference("uploads");
-        mDatabaseRef = FirebaseDatabase.getInstance().getReference("uploads");
+        //use user uid to create a wardrobe for them
 
 
+                mStorageRef = FirebaseStorage.getInstance().getReference(userUid);
+                mDatabaseRef = FirebaseDatabase.getInstance().getReference(userUid);// this creates unique wardrobe
+        //mDatabaseRef = FirebaseDatabase.getInstance().getReference("marketplace");
         mCreateButton.setOnClickListener(   new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if (isWifiConn == true) {// if connected to wifi
+                if (isWifiConn) {// if connected to wifi
 
                     if (mUploadTask != null && mUploadTask.isInProgress()) {
                         // if there is already an upload task on progress we don't want to upload same pictures
@@ -86,8 +108,9 @@ public class CreateArticleActivity extends AppCompatActivity {
                 }
                 else {
                     Toast.makeText(CreateArticleActivity.this, "You should be connected to wifi", Toast.LENGTH_SHORT).show();
-
                 }
+
+
             }
 
         });
@@ -124,7 +147,10 @@ public class CreateArticleActivity extends AppCompatActivity {
 
 
                             Task<Uri> urlTask = taskSnapshot.getStorage().getDownloadUrl();
+                            // FIXME: 2019-05-02 syntax error: while has empty body
                             while (!urlTask.isSuccessful());
+
+
                             Uri downloadUrl = urlTask.getResult();
 
 

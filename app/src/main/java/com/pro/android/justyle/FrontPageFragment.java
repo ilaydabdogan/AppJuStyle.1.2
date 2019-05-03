@@ -59,7 +59,6 @@ public class FrontPageFragment  extends Fragment implements View.OnClickListener
         mMarketplaceView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context, "fix this", Toast.LENGTH_SHORT).show();
                 mFragmentActionListener.onMarketplaceFragmentClicked();
             }
 
